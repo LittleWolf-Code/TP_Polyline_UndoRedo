@@ -34,3 +34,4 @@ class remove_line extends Command {
         this.layer.add(this.line);
     }
 }
+export default {add_line, remove_line}; 

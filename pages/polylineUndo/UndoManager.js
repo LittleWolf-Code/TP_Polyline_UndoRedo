@@ -1,5 +1,7 @@
 import Stack from './stack';
 import Konva from "konva";
+import add_line from './Command';
+import remove_line from './Command';
 
 class UndoManager{
 
@@ -45,3 +47,5 @@ class UndoManager{
         }
     }
 }
+
+export default UndoManager;
