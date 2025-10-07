@@ -1,6 +1,10 @@
 import Stack from './stack';
 import Konva from "konva";
 import { createMachine, interpret } from "xstate";
+import UndoManager from './UndoManager';
+import add_line from './Command';
+import remove_line from './Command';
+
 
 const stage = new Konva.Stage({
     container: "container",
@@ -15,6 +19,7 @@ const temporaire = new Konva.Layer();
 stage.add(dessin);
 stage.add(temporaire);
 
+const manager = new UndoManager();
 const MAX_POINTS = 10;
 let polyline // La polyline en cours de construction;
 
@@ -119,7 +124,8 @@ const polylineMachine = createMachine(
                 polyline.points(newPoints);
                 polyline.stroke("black"); // On change la couleur
                 // On sauvegarde la polyline dans la couche de dessin
-                dessin.add(polyline); // On l'ajoute à la couche de dessin
+                manager.execute(new add_line(dessin,polyline));
+                //dessin.add(polyline); // On l'ajoute à la couche de dessin
             },
             addPoint: (context, event) => {
                 const pos = stage.getPointerPosition();
@@ -129,7 +135,8 @@ const polylineMachine = createMachine(
                 temporaire.batchDraw(); // Redraw the layer to reflect the changes
             },
             abandon: (context, event) => {
-                polyline.remove();
+                manager.execute(new remove_line(dessin,polyline));
+                // polyline.remove();
             },
             removeLastPoint: (context, event) => {
                 const currentPoints = polyline.points(); // Get the current points of the line
